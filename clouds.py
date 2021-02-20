@@ -26,6 +26,8 @@ class Perlin:
         141,128,195,78,66,215,61,156,180
     ]
 
+    p = []
+
     def perlin(self, x, y, z):
         if (self.repeat > 0):
             x = x % self.repeat
@@ -44,14 +46,29 @@ class Perlin:
         v = self.fade(yf)
         w = self.fade(zf)
 
-        aaa = p[p[p[    xi ]+    yi ]+    zi ]
-        aba = p[p[p[    xi ]+inc(yi)]+    zi ]
-        aab = p[p[p[    xi ]+    yi ]+inc(zi)]
-        abb = p[p[p[    xi ]+inc(yi)]+inc(zi)]
-        baa = p[p[p[inc(xi)]+    yi ]+    zi ]
-        bba = p[p[p[inc(xi)]+inc(yi)]+    zi ]
-        bab = p[p[p[inc(xi)]+    yi ]+inc(zi)]
-        bbb = p[p[p[inc(xi)]+inc(yi)]+inc(zi)]
+        aaa = self.p[self.p[self.p[    xi ]+    yi ]+    zi ]
+        aba = self.p[self.p[self.p[    xi ]+self.inc(yi)]+    zi ]
+        aab = self.p[self.p[self.p[    xi ]+    yi ]+self.inc(zi)]
+        abb = self.p[self.p[self.p[    xi ]+self.inc(yi)]+self.inc(zi)]
+        baa = self.p[self.p[self.p[self.inc(xi)]+    yi ]+    zi ]
+        bba = self.p[self.p[self.p[self.inc(xi)]+self.inc(yi)]+    zi ]
+        bab = self.p[self.p[self.p[self.inc(xi)]+    yi ]+self.inc(zi)]
+        bbb = self.p[self.p[self.p[self.inc(xi)]+self.inc(yi)]+self.inc(zi)]
+
+        x1 = lerp(grad (aaa, xf  , yf  , zf), grad (baa, xf-1, yf  , zf), u)
+		x2 = lerp(	grad (aba, xf  , yf-1, zf), grad (bba, xf-1, yf-1, zf), u)
+		y1 = lerp(x1, x2, v)
+
+		x1 = lerp(grad (aab, xf  , yf  , zf-1), grad (bab, xf-1, yf  , zf-1), u)
+		x2 = lerp(	grad (abb, xf  , yf-1, zf-1), grad (bbb, xf-1, yf-1, zf-1),
+		          	u)
+		y2 = lerp (x1, x2, v)
+
+		return (lerp (y1, y2, w)+1)/2;
+
+    def inc(self, num):
+        return 1 # TODO: Change this
+        pass
 
     def fade(self, t):
         return t * t * t * (t * (t * 6 - 15) + 10);           # 6t^5 - 15t^4 + 10t^3
