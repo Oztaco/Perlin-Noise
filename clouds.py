@@ -55,7 +55,7 @@ class Perlin:
         bbb = self.p[self.p[self.p[self.inc(xi)]+self.inc(yi)]+self.inc(zi)]
 
         x1 = lerp(grad (aaa, xf  , yf  , zf), grad (baa, xf-1, yf  , zf), u)
-		x2 = lerp(	grad (aba, xf  , yf-1, zf), grad (bba, xf-1, yf-1, zf), u)
+		x2 = lerp(grad (aba, xf  , yf-1, zf), grad (bba, xf-1, yf-1, zf), u)
 		y1 = lerp(x1, x2, v)
 
 		x1 = lerp(grad (aab, xf  , yf  , zf-1), grad (bab, xf-1, yf  , zf-1), u)
@@ -65,9 +65,17 @@ class Perlin:
 
 		return (lerp (y1, y2, w)+1)/2
 
-    def inc(self, num):
-        return 1 # TODO: Change this
-        pass
+    # def inc(self, num:int) -> int:
+    #     num += 1
+    #     return num % repeat 
+
+	# # public int inc(int num) {
+	# # 	num++;
+	# # 	if (repeat > 0) num %= repeat;
+		
+	# # 	return num;
+	# # }
+	
 
     def fade(self, t):
         return t * t * t * (t * (t * 6 - 15) + 10);           # 6t^5 - 15t^4 + 10t^3
@@ -86,9 +94,9 @@ class Perlin:
 
         for octave in range(num_octaves):
             new_perlin_val = perlin(x * frequency, y * frequency, z * frequency)
-            total = total + (new_perlin_val * amplitude)
-            max_value = max_value + amplitude
-            amplitude = amplitude * persistence
+            total += (new_perlin_val * amplitude)
+            max_value += amplitude
+            amplitude *= persistence
             frequency = frequency * 2
         
         return total / max_value
