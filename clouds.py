@@ -45,48 +45,55 @@ class Perlin:
         v = self.fade(yf)
         w = self.fade(zf)
 
-        aaa = self.p[self.p[self.p[    xi ]+    yi ]+    zi ]
-        aba = self.p[self.p[self.p[    xi ]+self.inc(yi)]+    zi ]
-        aab = self.p[self.p[self.p[    xi ]+    yi ]+self.inc(zi)]
-        abb = self.p[self.p[self.p[    xi ]+self.inc(yi)]+self.inc(zi)]
-        baa = self.p[self.p[self.p[self.inc(xi)]+    yi ]+    zi ]
-        bba = self.p[self.p[self.p[self.inc(xi)]+self.inc(yi)]+    zi ]
-        bab = self.p[self.p[self.p[self.inc(xi)]+    yi ]+self.inc(zi)]
-        bbb = self.p[self.p[self.p[self.inc(xi)]+self.inc(yi)]+self.inc(zi)]
+        aaa = self.p[self.p[self.p[         xi ] +          yi ] +          zi ]
+        aba = self.p[self.p[self.p[         xi ] + self.inc(yi)] +          zi ]
+        aab = self.p[self.p[self.p[         xi ] +          yi ] + self.inc(zi)]
+        abb = self.p[self.p[self.p[         xi ] + self.inc(yi)] + self.inc(zi)]
+        baa = self.p[self.p[self.p[self.inc(xi)] +          yi ] +          zi ]
+        bba = self.p[self.p[self.p[self.inc(xi)] + self.inc(yi)] +          zi ]
+        bab = self.p[self.p[self.p[self.inc(xi)] +          yi ] + self.inc(zi)]
+        bbb = self.p[self.p[self.p[self.inc(xi)] + self.inc(yi)] + self.inc(zi)]
 
-        x1 = lerp(grad (aaa, xf  , yf  , zf), grad (baa, xf-1, yf  , zf), u)
-		x2 = lerp(grad (aba, xf  , yf-1, zf), grad (bba, xf-1, yf-1, zf), u)
-		y1 = lerp(x1, x2, v)
+        x1 = self.lerp(self.grad(aaa, xf  , yf  , zf), self.grad(baa, xf-1, yf  , zf), u)
+        x2 = self.lerp(self.grad(aba, xf  , yf-1, zf), self.grad(bba, xf-1, yf-1, zf), u)
+        y1 = self.lerp(x1, x2, v)
 
-		x1 = lerp(grad (aab, xf  , yf  , zf-1), grad (bab, xf-1, yf  , zf-1), u)
-		x2 = lerp(	grad (abb, xf  , yf-1, zf-1), grad (bbb, xf-1, yf-1, zf-1),
-		          	u)
-		y2 = lerp (x1, x2, v)
+        x1 = self.lerp(self.grad(aab, xf  , yf  , zf-1), self.grad(bab, xf-1, yf  , zf-1), u)
+        x2 = self.lerp(self.grad(abb, xf  , yf-1, zf-1), self.grad(bbb, xf-1, yf-1, zf-1), u)
+        y2 = self.lerp(x1, x2, v)
 
-		return (lerp (y1, y2, w)+1)/2
+        return (self.lerp(y1, y2, w) + 1) / 2
 
-    # def inc(self, num:int) -> int:
-    #     num += 1
-    #     return num % repeat 
-
-	# # public int inc(int num) {
-	# # 	num++;
-	# # 	if (repeat > 0) num %= repeat;
-		
-	# # 	return num;
-	# # }
-	
+    def inc(self, num):
+        return 1 # TODO: Change this
 
     def fade(self, t):
-        return t * t * t * (t * (t * 6 - 15) + 10);           # 6t^5 - 15t^4 + 10t^3
+        return t * t * t * (t * (t * 6 - 15) + 10);       # 6t^5 - 15t^4 + 10t^3
 
     def grad(self, hash, x, y, z):
-        pass
+        val = hash & 0xF
+        if   val == 0x0: return  x + y
+        elif val == 0x1: return -x + y
+        elif val == 0x2: return  x - y
+        elif val == 0x3: return -x - y
+        elif val == 0x4: return  x + z
+        elif val == 0x5: return -x + z
+        elif val == 0x6: return  x - z
+        elif val == 0x7: return -x - z
+        elif val == 0x8: return  y + z
+        elif val == 0x9: return -y + z
+        elif val == 0xA: return  y - z
+        elif val == 0xB: return -y - z
+        elif val == 0xC: return  y + x
+        elif val == 0xD: return -y + z
+        elif val == 0xE: return  y - x
+        elif val == 0xF: return -y - z
+        else: return 0
 
     def lerp(self, a, b, x):
         return a + x * (b - a)
 
-    def octive_perlin(x:float, y:float, z:float, num_octaves: int, persistence:float) -> float:
+    def octive_perlin(self, x:float, y:float, z:float, num_octaves: int, persistence:float) -> float:
         total = 0
         frequency = 1
         amplitude = 1
@@ -98,6 +105,5 @@ class Perlin:
             max_value += amplitude
             amplitude *= persistence
             frequency = frequency * 2
-        
-        return total / max_value
 
+        return total / max_value
