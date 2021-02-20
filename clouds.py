@@ -1,9 +1,11 @@
+import math as m
 from PIL import Image
 
 print("Hey")
 im = Image.new("RGB", (500, 700), (255, 0, 0))
 im.show()
 print("Done")
+
 
 class Perlin:
     def __init__(self):
@@ -27,7 +29,7 @@ class Perlin:
 
     p = []
 
-    def perlin(self, x, y, z):
+    def perlin(self, x:float, y:float, z:float) -> float:
         if (self.repeat > 0):
             x = x % self.repeat
             y = y % self.repeat
@@ -65,16 +67,17 @@ class Perlin:
         return (self.lerp(y1, y2, w) + 1) / 2
 
 
-    def inc(self, num):
+    def inc(self, num: int) -> int:
         num += 1
-        if repeat > 0: num %= repeat
-        return num	
+        if self.repeat > 0: num %= self.repeat
+        return num
 
 
-    def fade(self, t):
-        return t * t * t * (t * (t * 6 - 15) + 10);       # 6t^5 - 15t^4 + 10t^3
+    def fade(self, t:float) -> float:  # 6t^5 - 15t^4 + 10t^3
+        return m.pow(6 *t , 5) - m.pow(15 * t, 4) + m.pow(10 * t, 3)
 
-    def grad(self, hash, x, y, z):
+
+    def grad(self, hash: int, x: float, y: float, z: float) -> float:
         val = hash & 0xF
         if   val == 0x0: return  x + y
         elif val == 0x1: return -x + y
@@ -94,8 +97,10 @@ class Perlin:
         elif val == 0xF: return -y - z
         else: return 0
 
-    def lerp(self, a, b, x):
+
+    def lerp(self, a: float, b:float, x:float) -> float:
         return a + x * (b - a)
+
 
     def octive_perlin(self, x:float, y:float, z:float, num_octaves: int, persistence:float) -> float:
         total = 0
