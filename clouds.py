@@ -64,8 +64,12 @@ class Perlin:
 
         return (self.lerp(y1, y2, w) + 1) / 2
 
+
     def inc(self, num):
-        return 1 # TODO: Change this
+        num += 1
+        if repeat > 0: num %= repeat
+        return num	
+
 
     def fade(self, t):
         return t * t * t * (t * (t * 6 - 15) + 10);       # 6t^5 - 15t^4 + 10t^3
