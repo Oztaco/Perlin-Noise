@@ -5,20 +5,7 @@ im = Image.new("RGB", (500, 700), (255, 0, 0))
 im.show()
 print("Done")
 
-def perlin(x, y, z):
-    pass
-
-def perlin(x, y, z):
-    pass
-
-def fade(t):
-    return t * t * t * (t * (t * 6 - 15) + 10);           # 6t^5 - 15t^4 + 10t^3
-
-def grad(hash, x, y, z):
-    pass
-
-def lerp(a, b, x):
-    return a + x * (b - a)
+repeat = -1
 
 permutation = [151,160, 137,91,90,15,131, 13,201,95,96,53, 194,233,7,225,140,36,
     103,30,69,142,8,99,37,240,21,10,23,190, 6,148,247,120,234,75,0,26,197,62,94,
@@ -34,3 +21,40 @@ permutation = [151,160, 137,91,90,15,131, 13,201,95,96,53, 194,233,7,225,140,36,
     204,176,115,121,50,45, 127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,
     141,128,195,78,66,215,61,156,180
 ]
+
+def perlin(x, y, z):
+    if (repeat > 0):
+        x = x % repeat
+        y = y % repeat
+        z = z % repeat
+
+    xi = int(x) & 255
+    yi = int(yi) & 255
+    zi = int(zi) & 255
+
+    xf = x - int(x)
+    yf = y - int(y)
+    zf = z - int(z)
+
+    u = fade(xf)
+    v = fade(yf)
+    w = fade(zf)
+
+    int aaa, aba, aab, abb, baa, bba, bab, bbb
+    aaa = p[p[p[    xi ]+    yi ]+    zi ];
+    aba = p[p[p[    xi ]+inc(yi)]+    zi ];
+    aab = p[p[p[    xi ]+    yi ]+inc(zi)];
+    abb = p[p[p[    xi ]+inc(yi)]+inc(zi)];
+    baa = p[p[p[inc(xi)]+    yi ]+    zi ];
+    bba = p[p[p[inc(xi)]+inc(yi)]+    zi ];
+    bab = p[p[p[inc(xi)]+    yi ]+inc(zi)];
+    bbb = p[p[p[inc(xi)]+inc(yi)]+inc(zi)];
+
+def fade(t):
+    return t * t * t * (t * (t * 6 - 15) + 10);           # 6t^5 - 15t^4 + 10t^3
+
+def grad(hash, x, y, z):
+    pass
+
+def lerp(a, b, x):
+    return a + x * (b - a)
