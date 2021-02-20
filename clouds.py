@@ -5,7 +5,8 @@ im = Image.new("RGB", (500, 700), (255, 0, 0))
 im.show()
 print("Done")
 
-public double perlin(double x, double y, double z);
+def perlin(x, y, z):
+    pass
 
 def perlin(x, y, z):
     pass
