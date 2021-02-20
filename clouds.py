@@ -26,23 +26,23 @@ class Perlin:
         141,128,195,78,66,215,61,156,180
     ]
 
-    def perlin(x, y, z):
-        if (repeat > 0):
-            x = x % repeat
-            y = y % repeat
-            z = z % repeat
+    def perlin(self, x, y, z):
+        if (self.repeat > 0):
+            x = x % self.repeat
+            y = y % self.repeat
+            z = z % self.repeat
 
         xi = int(x) & 255
-        yi = int(yi) & 255
-        zi = int(zi) & 255
+        yi = int(y) & 255
+        zi = int(z) & 255
 
         xf = x - int(x)
         yf = y - int(y)
         zf = z - int(z)
 
-        u = fade(xf)
-        v = fade(yf)
-        w = fade(zf)
+        u = self.fade(xf)
+        v = self.fade(yf)
+        w = self.fade(zf)
 
         aaa = p[p[p[    xi ]+    yi ]+    zi ]
         aba = p[p[p[    xi ]+inc(yi)]+    zi ]
@@ -53,11 +53,11 @@ class Perlin:
         bab = p[p[p[inc(xi)]+    yi ]+inc(zi)]
         bbb = p[p[p[inc(xi)]+inc(yi)]+inc(zi)]
 
-    def fade(t):
+    def fade(self, t):
         return t * t * t * (t * (t * 6 - 15) + 10);           # 6t^5 - 15t^4 + 10t^3
 
-    def grad(hash, x, y, z):
+    def grad(self, hash, x, y, z):
         pass
 
-    def lerp(a, b, x):
+    def lerp(self, a, b, x):
         return a + x * (b - a)
