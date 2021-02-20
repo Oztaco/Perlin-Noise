@@ -23,8 +23,7 @@ class Perlin:
         232,178,185, 112,104,218, 246,97,228,251, 34,242,193,238,210,144,12,191,179,
         162, 241,81,51,145,235,249,14,239,107,49,192, 214,31,181,199,106,157,184,84,
         204,176,115,121,50,45, 127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,
-        141,128,195,78,66,215,61,156,180
-    ]
+        141,128,195,78,66,215,61,156,180]
 
     p = []
 
@@ -93,3 +92,18 @@ class Perlin:
 
     def lerp(self, a, b, x):
         return a + x * (b - a)
+
+    def octive_perlin(self, x:float, y:float, z:float, num_octaves: int, persistence:float) -> float:
+        total = 0
+        frequency = 1
+        amplitude = 1
+        max_value = 0  # Used for normalizing result to 0.0 to 1.0
+
+        for octave in range(num_octaves):
+            new_perlin_val = self.perlin(x * frequency, y * frequency, z * frequency)
+            total = total + (new_perlin_val * amplitude)
+            max_value = max_value + amplitude
+            amplitude = amplitude * persistence
+            frequency = frequency * 2
+
+        return total / max_value
