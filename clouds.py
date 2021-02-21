@@ -13,6 +13,19 @@ class Perlin:
 
     repeat = -1
 
+    # Hash lookup table - randomly arranged array of all numbers from 0-255 inclusive
+    # Defined by Ken Perlin
+
+    # This is the table used to define the gradient vectors, ie. the vectors at the edge of 
+    # each rectangle overlaying the noise which are then dotted with the distance vectors
+    # to determine the value of any given coordinate
+    #
+    # Note: gradient vectors -> vectors going outside of overlayed grid
+    #       distance vectors -> vecors defining the distance from any corner point on the overlayed
+    #                           grid to any coordinate inside of it 
+    #
+    # https://gamedev.stackexchange.com/questions/170239/understanding-the-gradient-in-perlin-noise#
+    # 
     permutation = [151,160, 137,91,90,15,131, 13,201,95,96,53, 194,233,7,225,140,36,
         103,30,69,142,8,99,37,240,21,10,23,190, 6,148,247,120,234,75,0,26,197,62,94,
         252,219,203, 117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,
@@ -27,26 +40,43 @@ class Perlin:
         204,176,115,121,50,45, 127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,
         141,128,195,78,66,215,61,156,180]
 
-    p = []
+    p = []  # Used as a hash function to determine gradient vectors
+    @staticmethod
+    def Perlin() -> None:
+        # Populate p hash table.
+        p_vals = range(512)
+        for i in p_vals:
+            p[i] = permutation[i % 256]
 
     def perlin(self, x:float, y:float, z:float) -> float:
         if (self.repeat > 0):
+            # Localize coordinates inside of unit cube only in the case of repetition
             x = x % self.repeat
             y = y % self.repeat
             z = z % self.repeat
 
+        # Calculate the "unit cube" in which the coordinates are located. The left
+        # bound is ( |_x_|,|_y_|,|_z_| ) and the right bound is that plus 1. Ensure
+        # that they are bounded at 255 to avoid overflow when querying the p array.
+        # Note that this will cause the patterns to repeat every 256 coordinates.
         xi = int(x) & 255
         yi = int(y) & 255
         zi = int(z) & 255
 
+        # Calculate the point's location (from 0.0 to 1.0) inside its unit cube.
         xf = x - int(x)
         yf = y - int(y)
         zf = z - int(z)
-
+        
+        # Apply the fade function - enables smoother seams between unit cubes after
+        # vectors are dotted
         u = self.fade(xf)
         v = self.fade(yf)
         w = self.fade(zf)
 
+        # Hash function for all 8 unit cube coordinates surrounding the input coordinate
+        # Note that this could be replaced with a random number generator with a constant
+        # seed but that could bottleneck performance -> https://stackoverflow.com/q/45625145
         aaa = self.p[self.p[self.p[         xi ] +          yi ] +          zi ]
         aba = self.p[self.p[self.p[         xi ] + self.inc(yi)] +          zi ]
         aab = self.p[self.p[self.p[         xi ] +          yi ] + self.inc(zi)]
@@ -56,28 +86,52 @@ class Perlin:
         bab = self.p[self.p[self.p[self.inc(xi)] +          yi ] + self.inc(zi)]
         bbb = self.p[self.p[self.p[self.inc(xi)] + self.inc(yi)] + self.inc(zi)]
 
-        x1 = self.lerp(self.grad(aaa, xf  , yf  , zf), self.grad(baa, xf-1, yf  , zf), u)
-        x2 = self.lerp(self.grad(aba, xf  , yf-1, zf), self.grad(bba, xf-1, yf-1, zf), u)
+        # Putting it all together - the gradient function calculates the dot product between the 
+        # pseudorandom gradient vector and the vector from the input coordinate to the 8 urrounding
+        # points in its unit cube. This is all combined via linear interpolation as a sort of weighted 
+        # average of faded values (u,v,w)
+        x1 = self.lerp(self.gradient(aaa, xf  , yf  , zf), self.gradient(baa, xf-1, yf  , zf), u)
+        x2 = self.lerp(self.gradient(aba, xf  , yf-1, zf), self.gradient(bba, xf-1, yf-1, zf), u)
         y1 = self.lerp(x1, x2, v)
 
-        x1 = self.lerp(self.grad(aab, xf  , yf  , zf-1), self.grad(bab, xf-1, yf  , zf-1), u)
-        x2 = self.lerp(self.grad(abb, xf  , yf-1, zf-1), self.grad(bbb, xf-1, yf-1, zf-1), u)
+        x1 = self.lerp(self.gradient(aab, xf  , yf  , zf-1), self.gradient(bab, xf-1, yf  , zf-1), u)
+        x2 = self.lerp(self.gradient(abb, xf  , yf-1, zf-1), self.gradient(bbb, xf-1, yf-1, zf-1), u)
         y2 = self.lerp(x1, x2, v)
 
         return (self.lerp(y1, y2, w) + 1) / 2
 
 
     def inc(self, num: int) -> int:
+        # Increment with allowence for repetition 
         num += 1
         if self.repeat > 0: num %= self.repeat
         return num
 
 
     def fade(self, t:float) -> float:  # 6t^5 - 15t^4 + 10t^3
+        """
+        This function is used to account for artifacts left by the dot product of each
+        vector. It causes vectors to have a smoother curve
+        
+        t is the value of a vector in an individual dimension (ie. x, y, z, etc.)
+        This function must be run once per dimension of the shape we are generating
+        with perlin noise (for 2D clouds, twice).
+        """
         return m.pow(6 *t , 5) - m.pow(15 * t, 4) + m.pow(10 * t, 3)
 
 
-    def grad(self, hash: int, x: float, y: float, z: float) -> float:
+    def gradient(self, hash: int, x: float, y: float, z: float) -> float:
+        """
+        Serves to randomly choose a vector from the following 12 as detailed in the
+        initial paper on Perlin Noise:
+        (1,1,0),  (-1,1,0),  (1,-1,0), (-1,-1,0), (1,0,1),  (-1,0,1),
+        (1,0,-1), (-1,0,-1), (0,1,1),  (0,-1,1),  (0,1,-1), (0,-1,-1) 
+
+        This vector determined by the last 4 bits of the hash function value (the first
+        parameter in this function).
+        
+        The following 3 parameters represent the location vector to be used for the dot product.
+        """
         val = hash & 0xF
         if   val == 0x0: return  x + y
         elif val == 0x1: return -x + y
@@ -99,10 +153,16 @@ class Perlin:
 
 
     def lerp(self, a: float, b:float, x:float) -> float:
+        # Linear Interpolation!
         return a + x * (b - a)
 
 
     def octive_perlin(self, x:float, y:float, z:float, num_octaves: int, persistence:float) -> float:
+        """
+        Frequency = 2 raised to the number of octaves
+        Amplitude = persistance raised to the number of octaves
+        Persistance is a measure of how much influence each successive octave has
+        """
         total = 0
         frequency = 1
         amplitude = 1
