@@ -114,8 +114,8 @@ class Perlin:
         vector. It causes vectors to have a smoother curve
         
         t is the value of a vector in an individual dimension (ie. x, y, z, etc.)
-        This function must be run once per dimension of the shape we are generating
-        with perlin noise (for 2D clouds, twice).
+        This function must be run once per dimension of the shape we are generating with 
+        perlin noise (for 2D clouds, twice) to generate the value for a single coordinate.
         """
         return m.pow(6 *t , 5) - m.pow(15 * t, 4) + m.pow(10 * t, 3)
 
