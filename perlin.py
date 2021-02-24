@@ -10,7 +10,6 @@ class Perlin:
         
         self.p = [None] * 512  # Used as a hash function to determine gradient vectors
 
-        
         # Hash lookup table - randomly arranged array of all numbers from 0-255 inclusive
         # Defined by Ken Perlin
 
@@ -123,7 +122,7 @@ class Perlin:
         This function must be run once per dimension of the shape we are generating with 
         perlin noise (for 2D clouds, twice) to generate the value for a single coordinate.
         """
-        return m.pow(6 *t , 5) - m.pow(15 * t, 4) + m.pow(10 * t, 3)
+        return (6 * m.pow(t , 5)) - (15 * m.pow(t, 4)) + (10 * m.pow(t, 3))
 
 
     def gradient(self, hash: int, x: float, y: float, z: float) -> float:
