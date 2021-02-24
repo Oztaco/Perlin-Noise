@@ -22,7 +22,7 @@ def perlin_dataframe(df_len:int, df_height:int, num_octives:int, persistence:flo
     return perlin_df
 
 
-def two_d_vis(img_len:int=500, img_height:int=1000, num_octaves:int=1, persistence:int=1):
+def two_d_vis(img_len:int=500, img_height:int=500, num_octaves:int=1, persistence:int=1):
     perlin_df = perlin_dataframe(img_height, img_len, num_octaves, persistence)
     print(perlin_df)
     
@@ -30,10 +30,8 @@ def two_d_vis(img_len:int=500, img_height:int=1000, num_octaves:int=1, persisten
     img = Image.fromarray(np.uint8(perlin_df.to_numpy()*255))
     img_with_label = ImageDraw.Draw(img)
     label_str = "Octaves: " + str(num_octaves) + "\nPersistence: " + str(persistence)
-
+    file_name_str = "perlin_2d_vis_" + str(num_octaves) + "_octaves_" + str(persistence) + "_persistence.jpeg"
     img_with_label.text((50,50), label_str)
-    img.show()
+    img.save("perlin_images/" + file_name_str)
 
-two_d_vis(num_octaves=10, persistence=.5)
-
-    
+two_d_vis(num_octaves=1, persistence=.25)
