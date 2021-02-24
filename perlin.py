@@ -1,4 +1,5 @@
 import math as m
+from timing import timing
 
 class Perlin:
     
