@@ -123,7 +123,8 @@ class Perlin:
         This function must be run once per dimension of the shape we are generating with 
         perlin noise (for 2D clouds, twice) to generate the value for a single coordinate.
         """
-        return (6 * m.pow(t , 5)) - (15 * m.pow(t, 4)) + (10 * m.pow(t, 3))
+        # return (6 * m.pow(t , 5)) - (15 * m.pow(t, 4)) + (10 * m.pow(t, 3))
+        return t * t * t * (t * (t * 6 - 15) + 10)
 
 
     def gradient(self, hash: int, x: float, y: float, z: float) -> float:
