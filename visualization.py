@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
 import perlin as per
-from matplotlib import cm
+from timing import timing
 from PIL import Image, ImageDraw
 
+@timing
 def perlin_dataframe(df_len:int, df_height:int, num_octives:int, persistence:float) -> pd.DataFrame:
     perlin_obj = per.Perlin()
     perlin_df = pd.DataFrame(index=range(df_len),
