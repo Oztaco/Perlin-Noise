@@ -2,28 +2,28 @@ import math as m
 from timing import timing
 
 class Perlin:
-    
+
     p = []
-    
+
     permutation = []
-    
+
     def __init__(self):
-        
+
         self.p = [None] * 512  # Used as a hash function to determine gradient vectors
 
         # Hash lookup table - randomly arranged array of all numbers from 0-255 inclusive
         # Defined by Ken Perlin
 
-        # This is the table used to define the gradient vectors, ie. the vectors at the edge of 
+        # This is the table used to define the gradient vectors, ie. the vectors at the edge of
         # each rectangle overlaying the noise which are then dotted with the distance vectors
         # to determine the value of any given coordinate
         #
         # Note: gradient vectors -> vectors going outside of overlayed grid
         #       distance vectors -> vecors defining the distance from any corner point on the overlayed
-        #                           grid to any coordinate inside of it 
+        #                           grid to any coordinate inside of it
         #
         # https://gamedev.stackexchange.com/questions/170239/understanding-the-gradient-in-perlin-noise#
-        # 
+        #
         self.permutation = [151,160, 137,91,90,15,131, 13,201,95,96,53, 194,233,7,225,140,36,
             103,30,69,142,8,99,37,240,21,10,23,190, 6,148,247,120,234,75,0,26,197,62,94,
             252,219,203, 117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,
@@ -37,13 +37,13 @@ class Perlin:
             162, 241,81,51,145,235,249,14,239,107,49,192, 214,31,181,199,106,157,184,84,
             204,176,115,121,50,45, 127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,
             141,128,195,78,66,215,61,156,180]
-        
+
         # Populate p hash table.
         p_vals = range(512)
         for i in p_vals:
             self.p[i] = self.permutation[i % 256]
-            
-            
+
+
     repeat = -1
 
     # Used as a hash function to determine gradient vectors
@@ -73,7 +73,7 @@ class Perlin:
         xf = x - int(x)
         yf = y - int(y)
         zf = z - int(z)
-        
+
         # Apply the fade function - enables smoother seams between unit cubes after
         # vectors are dotted
         u = self.fade(xf)
@@ -92,9 +92,9 @@ class Perlin:
         bab = self.p[self.p[self.p[self.inc(xi)] +          yi ] + self.inc(zi)]
         bbb = self.p[self.p[self.p[self.inc(xi)] + self.inc(yi)] + self.inc(zi)]
 
-        # Putting it all together - the gradient function calculates the dot product between the 
+        # Putting it all together - the gradient function calculates the dot product between the
         # pseudorandom gradient vector and the vector from the input coordinate to the 8 urrounding
-        # points in its unit cube. This is all combined via linear interpolation as a sort of weighted 
+        # points in its unit cube. This is all combined via linear interpolation as a sort of weighted
         # average of faded values (u,v,w)
         x1 = self.lerp(self.gradient(aaa, xf  , yf  , zf), self.gradient(baa, xf-1, yf  , zf), u)
         x2 = self.lerp(self.gradient(aba, xf  , yf-1, zf), self.gradient(bba, xf-1, yf-1, zf), u)
@@ -108,7 +108,7 @@ class Perlin:
 
 
     def inc(self, num: int) -> int:
-        # Increment with allowence for repetition 
+        # Increment with allowence for repetition
         num += 1
         if self.repeat > 0: num %= self.repeat
         return num
@@ -118,9 +118,9 @@ class Perlin:
         """
         This function is used to account for artifacts left by the dot product of each
         vector. It causes vectors to have a smoother curve
-        
+
         t is the value of a vector in an individual dimension (ie. x, y, z, etc.)
-        This function must be run once per dimension of the shape we are generating with 
+        This function must be run once per dimension of the shape we are generating with
         perlin noise (for 2D clouds, twice) to generate the value for a single coordinate.
         """
         # return (6 * m.pow(t , 5)) - (15 * m.pow(t, 4)) + (10 * m.pow(t, 3))
@@ -132,11 +132,11 @@ class Perlin:
         Serves to randomly choose a vector from the following 12 as detailed in the
         initial paper on Perlin Noise:
         (1,1,0),  (-1,1,0),  (1,-1,0), (-1,-1,0), (1,0,1),  (-1,0,1),
-        (1,0,-1), (-1,0,-1), (0,1,1),  (0,-1,1),  (0,1,-1), (0,-1,-1) 
+        (1,0,-1), (-1,0,-1), (0,1,1),  (0,-1,1),  (0,1,-1), (0,-1,-1)
 
         This vector determined by the last 4 bits of the hash function value (the first
         parameter in this function).
-        
+
         The following 3 parameters represent the location vector to be used for the dot product.
         """
         val = hash & 0xF
