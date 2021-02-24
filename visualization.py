@@ -13,7 +13,7 @@ def perlin_dataframe(df_len:int, df_height:int) -> pd.DataFrame:
     # perlin_df = perlin_df.applymap(lambda x: perlin_obj.perlin(x, x % , 0))
     for x in range(0, df_len):
         for y in  range(0, df_height):
-            perlin_df.iat[x,y] = perlin_obj.perlin(x / 255, y / 255, 0.5)
+            perlin_df.iat[x,y] = perlin_obj.octive_perlin(x / 255, y / 255, 0.5, 4, .5)
             
     return perlin_df
 
@@ -24,6 +24,7 @@ def two_d_vis(img_len:int=500, img_height:int=1000):
     # Create base image    
     img = Image.fromarray(np.uint8(perlin_df.to_numpy()*255))
     img.show()
+
 two_d_vis()
 
     

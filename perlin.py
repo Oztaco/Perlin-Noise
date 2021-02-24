@@ -174,7 +174,7 @@ class Perlin:
         max_value = 0  # Used for normalizing result to 0.0 to 1.0
 
         for octave in range(num_octaves):
-            new_perlin_val = perlin(x * frequency, y * frequency, z * frequency)
+            new_perlin_val = self.perlin(x * frequency, y * frequency, z * frequency)
             total += (new_perlin_val * amplitude)
             max_value += amplitude
             amplitude *= persistence
