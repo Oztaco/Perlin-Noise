@@ -18,8 +18,8 @@ def perlin_dataframe(df_len:int, df_height:int) -> pd.DataFrame:
     return perlin_df
 
 
-def two_d_vis(img_len:int=1000, img_height:int=1000):
-    perlin_df = perlin_dataframe(img_len, img_height)
+def two_d_vis(img_len:int=500, img_height:int=1000):
+    perlin_df = perlin_dataframe(img_height, img_len)
     print(perlin_df)
     # Create base image    
     img = Image.fromarray(np.uint8(perlin_df.to_numpy()*255))
