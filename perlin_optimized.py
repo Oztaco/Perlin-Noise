@@ -4,10 +4,10 @@ from timing import timing
 from collections import defaultdict
 
 class Perlin:
-
-    p = pd.Series()
+    p = []
     permutation = pd.Series()
     repeat = -1
+    gradient_dict = {}
 
     def __init__(self):
 
@@ -45,6 +45,8 @@ class Perlin:
         # Populate p hash table.
         for i in range(512):
             self.p[i] = self.permutation[i % 256]
+            
+        self.gradient_dict = self.populate_gradient_dict()
 
 
     def perlin(self, x:float, y:float, z:float) -> float:
@@ -103,8 +105,7 @@ class Perlin:
     def inc(self, num: int) -> int:
         # Increment with allowence for repetition
         num += 1
-        if self.repeat > 0: num %= self.repeat
-        return num
+        return num % self.repeat if self.repeat > 0 else num
 
 
     def fade(self, t:float) -> float:  # 6t^5 - 15t^4 + 10t^3
@@ -139,8 +140,6 @@ class Perlin:
         grad_dict[0xE] = lambda x, y, z:  y - x
         grad_dict[0xF] = lambda x, y, z: -y - z
         return grad_dict
-    gradient_dict = populate_gradient_dict()
-
     
 
     def gradient(self, hash: int, x: float, y: float, z: float) -> float:
@@ -155,9 +154,7 @@ class Perlin:
 
         The following 3 parameters represent the location vector to be used for the dot product.
         """
-        dict_key = hash & 0xF
-        val = dict_key
-        return self.gradient_dict[dict_key](x, y,  z)
+        return self.gradient_dict[hash & 0xF](x, y, z)
     
 
     def lerp(self, a: float, b:float, x:float) -> float:
@@ -165,7 +162,6 @@ class Perlin:
         return a + x * (b - a)
 
 
-    # @timing
     def octive_perlin(self, x:float, y:float, z:float, num_octaves: int, persistence:float) -> float:
         """
         Frequency = 2 raised to the number of octaves
@@ -182,6 +178,6 @@ class Perlin:
             total += (new_perlin_val * amplitude)
             max_value += amplitude
             amplitude *= persistence
-            frequency = frequency * 2
+            frequency *= 2
 
         return total / max_value
