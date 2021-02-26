@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import perlin as per
+import perlin_optimized as per
 from timing import timing
 from PIL import Image, ImageDraw
 
