@@ -79,13 +79,13 @@ class Perlin:
         # Note that this could be replaced with a random number generator with a constant
         # seed but that could bottleneck performance -> https://stackoverflow.com/q/45625145
         aaa = self.p[self.p[self.p[         xi ] +          yi ] +          zi ]
-        aba = self.p[self.p[self.p[         xi ] + self.inc(yi)] +          zi ]
-        aab = self.p[self.p[self.p[         xi ] +          yi ] + self.inc(zi)]
-        abb = self.p[self.p[self.p[         xi ] + self.inc(yi)] + self.inc(zi)]
-        baa = self.p[self.p[self.p[self.inc(xi)] +          yi ] +          zi ]
-        bba = self.p[self.p[self.p[self.inc(xi)] + self.inc(yi)] +          zi ]
-        bab = self.p[self.p[self.p[self.inc(xi)] +          yi ] + self.inc(zi)]
-        bbb = self.p[self.p[self.p[self.inc(xi)] + self.inc(yi)] + self.inc(zi)]
+        aba = self.p[self.p[self.p[         xi ] +     (yi + 1)] +          zi ]
+        aab = self.p[self.p[self.p[         xi ] +          yi ] +     (zi + 1)]
+        abb = self.p[self.p[self.p[         xi ] +     (yi + 1)] +     (zi + 1)]
+        baa = self.p[self.p[self.p[    (xi + 1)] +          yi ] +          zi ]
+        bba = self.p[self.p[self.p[    (xi + 1)] +     (yi + 1)] +          zi ]
+        bab = self.p[self.p[self.p[    (xi + 1)] +          yi ] +     (zi + 1)]
+        bbb = self.p[self.p[self.p[    (xi + 1)] +     (yi + 1)] +     (zi + 1)]
 
         # Putting it all together - the gradient function calculates the dot product between the
         # pseudorandom gradient vector and the vector from the input coordinate to the 8 urrounding
@@ -100,15 +100,10 @@ class Perlin:
         y2 = self.lerp(x1, x2, v)
 
         return (self.lerp(y1, y2, w) + 1) / 2
+    
 
-
-    def inc(self, num: int) -> int:
-        # Increment with allowence for repetition
-        num += 1
-        return num % self.repeat if self.repeat > 0 else num
-
-
-    def fade(self, t:float) -> float:  # 6t^5 - 15t^4 + 10t^3
+    @staticmethod
+    def fade(t:float) -> float:  # 6t^5 - 15t^4 + 10t^3
         """
         This function is used to account for artifacts left by the dot product of each
         vector. It causes vectors to have a smoother curve
@@ -156,8 +151,8 @@ class Perlin:
         """
         return self.gradient_dict[hash & 0xF](x, y, z)
     
-
-    def lerp(self, a: float, b:float, x:float) -> float:
+    @staticmethod
+    def lerp(a: float, b:float, x:float) -> float:
         # Linear Interpolation!
         return a + x * (b - a)
 
