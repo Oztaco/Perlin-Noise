@@ -101,7 +101,11 @@ class Perlin:
 
         return (self.lerp(y1, y2, w) + 1) / 2
     
-
+    # def inc(self, num: int) -> int:
+    #     # Increment with allowence for repetition
+    #     num += 1
+    #     return num % self.repeat if self.repeat > 0 else num
+    
     @staticmethod
     def fade(t:float) -> float:  # 6t^5 - 15t^4 + 10t^3
         """
@@ -115,7 +119,7 @@ class Perlin:
         # return (6 * m.pow(t , 5)) - (15 * m.pow(t, 4)) + (10 * m.pow(t, 3))
         return t * t * t * (t * (t * 6 - 15) + 10)
 
-
+    @staticmethod
     def populate_gradient_dict(self=None) -> defaultdict:
         grad_dict = defaultdict()
         grad_dict[0x0] = lambda x, y, z:  x + y
@@ -155,7 +159,6 @@ class Perlin:
     def lerp(a: float, b:float, x:float) -> float:
         # Linear Interpolation!
         return a + x * (b - a)
-
 
     def octive_perlin(self, x:float, y:float, z:float, num_octaves: int, persistence:float) -> float:
         """

@@ -19,7 +19,10 @@ def get_perlin_matrix(len:int, height:int, num_octives:int, persistence:float) -
     return perlin_matrix
 
 
-def two_d_vis(img_len:int=500, img_height:int=500, num_octaves:int=1, persistence:int=1):
+def greyscale_color_map(height:float): return height * 255
+
+def two_d_vis(color_map=greyscale_color_map, img_len:int=500,
+              img_height:int=500, num_octaves:int=1, persistence:int=1):
     profiler.start()
     perlin_matrix = get_perlin_matrix(img_len, img_height, num_octaves, persistence)
     profiler.stop()
@@ -27,14 +30,16 @@ def two_d_vis(img_len:int=500, img_height:int=500, num_octaves:int=1, persistenc
     # Labeling
     label_str = "Octaves: " + str(num_octaves) + "\nPersistence: " + str(persistence)
     file_name_str = "perlin_2d_vis_" + str(num_octaves) + "_octaves_" + str(persistence) + \
-        "_persistence.jpeg"
+        "_persistence.png"
 
     # Render and save image
-    img = Image.fromarray(np.uint8(np.array(perlin_matrix)*255))
+    perlin_matrix_df = pd.DataFrame(perlin_matrix).applymap(lambda x: color_map(x))
+    img = Image.fromarray(np.uint8(perlin_matrix_df.to_numpy()))
     img_with_label = ImageDraw.Draw(img)
     img_with_label.text((50,50), label_str)
     img.save("perlin_images/" + file_name_str)
 
 profiler = Profiler()
-two_d_vis(img_len = 500,  img_height = 1000, num_octaves=7, persistence=.7)
+two_d_vis(img_len = 500, img_height = 1000, num_octaves=7, persistence=.7)
+# two_d_vis()
 print(profiler.output_text(unicode=True, color=True))
